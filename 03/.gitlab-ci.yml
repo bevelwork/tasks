@@ -1,0 +1,136 @@
+####
+# Dependencies
+####
+include:
+  - template: Jobs/SAST-IaC.gitlab-ci.yml
+  - project: 'bevel/ops/ci-templates'
+    file: 
+      - 'tf-vars.gitlab-ci.yml'
+      - 'semantic-release-ci.yml'
+  - /ci/jobs.gitlab-ci.yml
+
+####
+# Default: Setup components that are common to all downstream jobs
+####
+default:
+  image: registry.gitlab.com/bevel/ops/container-common/gitlab-aws-tf:debian
+  after_script:
+    - unset AWS_ACCESS_KEY_ID
+    - unset AWS_SECRET_ACCESS_KEY
+    - unset AWS_SESSION_TOKEN
+    - unset AWS_REGION
+    - unset ROLE_ARN
+    - unset ENVIRONMENT
+  #before_script:
+  #  - curl -s https://ip-ranges.amazonaws.com/ip-ranges.json | jq '.prefixes[] | select(.service == "ROUTE53_HEALTHCHECKS") | .ip_prefix' | tr '\n' ',' | sed 's/,$//g' |sed 's/"//g' > src/assets/r53_healthcheck_ips.csv
+
+stages:
+  - semrel
+  - test
+  - qa
+  - plan
+  - dev_apply
+  - apply
+  - danger
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - when: always
+
+release:
+  before_script:
+    - ''
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      
+kics-iac-sast:
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  before_script:
+    - ''  
+    
+format:
+  extends:
+    - .terraform_fmt
+
+tflint:
+  extends:
+    - .terraform_tflint
+
+# adev
+adev:validate:
+  extends: 
+    - .adev_vars
+    - .terraform_validate
+  needs:
+    - format
+
+adev:plan:
+  extends: 
+    - .adev_vars
+    - .terraform_plan
+
+adev:dev_apply:
+  extends:
+    - .adev_vars
+    - .terraform_dev_apply
+  needs:
+    - adev:plan
+
+adev:apply:
+  extends:
+    - .adev_vars
+    - .terraform_apply
+
+adev:destroy:
+  extends:
+    - .adev_vars
+    - .terraform_destroy
+
+# astg
+astg:validate:
+  extends: 
+    - .astg_vars
+    - .terraform_validate
+  needs:
+    - format
+    
+astg:plan:
+  extends: 
+    - .astg_vars
+    - .terraform_plan
+
+astg:apply:
+  extends:
+    - .astg_vars
+    - .terraform_apply
+
+astg:destroy:
+  extends:
+    - .astg_vars
+    - .terraform_destroy
+
+# aprd
+aprd:validate:
+  extends: 
+    - .aprd_vars
+    - .terraform_validate
+  needs:
+    - format
+    
+aprd:plan:
+  extends: 
+    - .aprd_vars
+    - .terraform_plan
+
+aprd:apply:
+  extends:
+    - .aprd_vars
+    - .terraform_apply
+
+aprd:destroy:
+  extends:
+    - .aprd_vars
+    - .terraform_destroy

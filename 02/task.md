@@ -1,0 +1,1 @@
+Take a look at the following dockerfile and recommend some improvements best practices that could be implemented. Take a look at [this](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/) for inspiration.

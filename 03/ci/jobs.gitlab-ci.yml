@@ -1,0 +1,117 @@
+###
+# Job Definitions
+# Provides the raw building blocks that we 
+# use for all the above actions
+###
+.login: &login
+    - >
+        STS=($(aws sts assume-role-with-web-identity
+        --role-arn ${CICD_ROLE_ARN}
+        --role-session-name "GitLabRunner-${CI_PROJECT_ID}-${CI_PIPELINE_ID}"
+        --web-identity-token $CI_JOB_JWT_V2
+        --duration-seconds 3600
+        --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]'
+        --output text))
+    - export AWS_ACCESS_KEY_ID="${STS[0]}"
+    - export AWS_SECRET_ACCESS_KEY="${STS[1]}"
+    - export AWS_SESSION_TOKEN="${STS[2]}"
+    - aws sts get-caller-identity
+    - echo ${ROLE_ARN}
+
+.terraform_validate:
+  stage: qa
+  script:
+    - *login
+    - make tf/validate
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: never
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+
+.terraform_fmt:
+  stage: qa
+  script:
+    - make tf/fmt
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: never
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+
+.terraform_tflint:
+    # Reference : https://gitlab.com/gitlab-com/gl-infra/common-ci-tasks/-/blob/main/tflint.yml
+    stage: qa
+    allow_failure: true 
+    needs: []
+    script:
+      - rm -rf "tflint-reports/"
+      - mkdir -p "tflint-reports/"
+      - echo "[SYS] Find all TF files and lint the directories of those files"
+      - tflint --init -c .tflint.hcl
+      - echo "[SYS] Loop through all the directories containing *.tf files and run tflint in them"
+      - find src -type f -name '*.tf' | grep -vE "${COMMON_TASK_VALIDATIONS_EXCLUDES_REGEXP:-__ignored__}" | sed -e 's#/[^/]*$##' | sort -u | grep -v "${TFLINT_EXCLUDE_REGEX:-__ignored__}" | while read -r dir; do
+          junit_file="$(echo "$dir"|sed -r 's/[^a-zA-Z0-9]+/-/g' | sed -r s/^-+\|-+$//g).xml";
+          echo "${dir} -------------------------------------------------------";
+          cd "${CI_PROJECT_DIR}/${dir}" || exit 1;
+          terraform init -backend=false -reconfigure;
+          tflint -c "${CI_PROJECT_DIR}/.tflint.hcl" . -f compact || echo "${dir}" >> "${CI_PROJECT_DIR}/tflint-reports/failed";
+          tflint -c "${CI_PROJECT_DIR}/.tflint.hcl" . -f junit > "${CI_PROJECT_DIR}/tflint-reports/${junit_file}";
+        done;
+      # tflint-reports/failed indicates a linter failure
+      - if [ -f "${CI_PROJECT_DIR}/tflint-reports/failed" ]; then
+          echo "Failures found in:";
+          cat "${CI_PROJECT_DIR}/tflint-reports/failed";
+          exit 1;
+        fi
+    after_script: |
+      cat <<-EOD
+      ----------------------------------------------------------
+      Need help? Documentation on the tflint CI job can be found at:
+      https://gitlab.com/gitlab-com/gl-infra/common-ci-tasks/-/blob/main/tflint.md
+      EOD
+    artifacts:
+      when: always
+      reports:
+        junit: tflint-reports/*.xml
+    rules:
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+        when: never
+      - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+
+.terraform_plan:
+  stage: plan
+  script:
+    - *login
+    - make tf/plan
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: never
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH || $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    
+.terraform_dev_apply:
+  stage: dev_apply
+  when: manual
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: never
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+  script:
+    - *login
+    - make tf/deploy
+
+.terraform_apply:
+  stage: apply
+  when: manual
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - *login
+    - make tf/deploy
+
+.terraform_destroy:
+  stage: danger
+  rules:
+    - if: '$ALLOW_DESTROY == "YES"  && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  when: manual
+  script:
+    - *login
+    - make tf/danger/destroy

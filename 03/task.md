@@ -1,0 +1,1 @@
+In this directory we have a gitlab pipeline and some dependencies that are referenced for running a Terraform deployment pipeline. Please look through the script and provide a quick summary of what is occurring and what some potential improvements to the process could be.
