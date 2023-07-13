@@ -97,17 +97,6 @@ tf/danger/destroy:
 		-var "webex_integration_key=${webex_integration_key}"
 
 
-.PHONY: docs
-docs:
-	terraform-docs markdown src > src/readme.md
-	terraform-docs markdown src/auth0_logs > src/auth0_logs/readme.md
-	terraform-docs markdown src/cw_ecs_dashboard > src/cw_ecs_dashboard/readme.md
-	terraform-docs markdown src/developer_iam > src/developer_iam/readme.md
-	terraform-docs markdown src/r53_healthcheck > src/r53_healthcheck/readme.md
-	terraform-docs markdown src/sns_webhook > src/sns_webhook/readme.md
-	terraform-docs markdown src/vpn > src/vpn/readme.md
-	terraform-docs markdown src/vpn_security_group_rules > src/vpn_security_group_rules/readme.md
-
 .PHONY: help
 help: ## Shows all targets and help from the Makefile (this message).
 	@grep --no-filename -E '^([a-z.A-Z_%-/]+:.*?)##' $(MAKEFILE_LIST) | sort | \
