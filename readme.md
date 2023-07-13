@@ -4,10 +4,10 @@ Welcome to the DevOps Example Task repository! This repository contains various 
 
 Each task is located in a separate subdirectory and has its own README.md file that provides details about the task. Here is an overview of the available tasks:
 
-1. [Task 01](./01/task.md): Terraform Optimization
-1. [Task 02](./02/task.md): Next.js Application Dockerization
-1. [Task 03](./03/task.md): GitLab Pipeline for Terraform
-1. [Task 04](./04/task.md): Architectural Questions and Descriptions
+1. [Task 01](./01): Terraform Optimization
+1. [Task 02](./02): Next.js Application Dockerization
+1. [Task 03](./03): GitLab Pipeline for Terraform
+1. [Task 04](./04): Architectural Questions and Descriptions
 
 ## Task Instructions
 
