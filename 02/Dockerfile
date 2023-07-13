@@ -8,7 +8,8 @@ RUN --mount=type=cache,target=/app/.npm \
     npm set cache .npm
 RUN npm install
 COPY . .
-RUN npm run build
+# This generates a ./.next folder that's required to run `npm run start`
+RUN npm run build 
 COPY .env* ./
 
 CMD ["npm", "run", "start"]
