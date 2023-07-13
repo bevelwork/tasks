@@ -4,10 +4,10 @@ Welcome to the DevOps Example Task repository! This repository contains various 
 
 Each task is located in a separate subdirectory and has its own README.md file that provides details about the task. Here is an overview of the available tasks:
 
-    [Task 01](./01/task.md): Terraform Optimization
-    [Task 02](./02/task.md): Next.js Application Dockerization
-    [Task 03](./03/task.md): GitLab Pipeline for Terraform
-    [Task 04](./04/task.md): Architectural Questions and Descriptions
+[Task 01](./01/task.md): Terraform Optimization
+[Task 02](./02/task.md): Next.js Application Dockerization
+[Task 03](./03/task.md): GitLab Pipeline for Terraform
+[Task 04](./04/task.md): Architectural Questions and Descriptions
 
 ## Task Instructions
 
@@ -21,7 +21,7 @@ To complete a task and submit your solutions, please follow these steps:
 
 Please note the following guidelines:
 
-1. Aim to spend no more than 5-10 minutes on each task. 
+1. Aim to spend no more than 5-10 minutes on each task.
 1. You can provide either code snippets or general responses describing your approach.
 1. Be concise, yet clear in your answers to keep the responses concise and informative.
 1. Feel free to leverage any relevant documentation, tools, or best practices while working on the tasks.
