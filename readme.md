@@ -8,6 +8,7 @@ Each task is located in a separate subdirectory and has its own README.md file t
 - [Task 02](./02): Next.js Application Dockerization
 - [Task 03](./03): GitLab Pipeline for Terraform
 - [Task 04](./04): Architectural Questions and Descriptions
+- [Task 05](./05): Sorting a file
 
 ## Task Instructions
 
