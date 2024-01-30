@@ -24,9 +24,9 @@
 
 .aprd_vars:
   variables:
-    CICD_ROLE_ARN: arn:aws:iam::989979068876:role/bevel-cicd-Role
-    ECS_REFRESH_ROLE_ARN: arn:aws:iam::989979068876:role/bevel-cicd-ECS-RefreshRunnerRole
-    LAMBDA_ROLE_ARN: arn:aws:iam::989979068876:role/bevel-cicd-lambda
+    CICD_ROLE_ARN: arn:aws:iam::111111111111:role/bevel-cicd-Role
+    ECS_REFRESH_ROLE_ARN: arn:aws:iam::111111111111:role/bevel-cicd-ECS-RefreshRunnerRole
+    LAMBDA_ROLE_ARN: arn:aws:iam::111111111111:role/bevel-cicd-lambda
     AWS_REGION: us-east-1
     ENVIRONMENT: aprd
     gitlab_registry_token: $aprd_gitlab_registry_token
