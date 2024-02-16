@@ -11,6 +11,7 @@ Each task is located in a separate subdirectory and has its own README.md file t
 - [Task 05](./05): Sorting a file
 - [Task 06](./06): Kubernetes Architecture Questions
 - [Task 07](./07): Code review of python/pytest suite 
+- [Task 08](./08): Code review of Go maintenance utility 
 
 ## Task Instructions
 
