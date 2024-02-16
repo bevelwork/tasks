@@ -9,6 +9,8 @@ Each task is located in a separate subdirectory and has its own README.md file t
 - [Task 03](./03): GitLab Pipeline for Terraform
 - [Task 04](./04): Architectural Questions and Descriptions
 - [Task 05](./05): Sorting a file
+- [Task 06](./06): Kubernetes Architecture Questions
+- [Task 07](./07): Code review of python/pytest suite 
 
 ## Task Instructions
 
